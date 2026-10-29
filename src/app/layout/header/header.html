@@ -1,0 +1,14 @@
+<header class="topbar">
+  <div>
+    <span class="eyebrow">OPERACIONES / TALLER</span
+    ><span class="workspace-label">Panel de gestión</span>
+  </div>
+  <div class="user-block">
+    <span class="avatar">{{ auth.sesion()?.nombreCompleto?.charAt(0) }}</span>
+    <div>
+      <strong>{{ auth.sesion()?.nombreCompleto }}</strong
+      ><small>{{ auth.sesion()?.roles?.join(' · ') }}</small>
+    </div>
+    <button class="text-button" (click)="auth.cerrarSesion()">Salir ↗</button>
+  </div>
+</header>

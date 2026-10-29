@@ -1,0 +1,25 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #13281b66;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  backdrop-filter: blur(3px);
+}
+.confirm-card {
+  background: white;
+  border-radius: 14px;
+  max-width: 440px;
+  width: 100%;
+  padding: 30px;
+  box-shadow: 0 18px 80px #112b2233;
+}
+.confirm-card p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.form-actions {
+  padding-bottom: 0;
+}
