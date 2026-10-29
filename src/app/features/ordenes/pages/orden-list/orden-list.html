@@ -1,0 +1,131 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">OPERACIONES / 01</span>
+    <h1>Órdenes de servicio</h1>
+    <p class="muted">El trabajo del taller, de principio a fin.</p>
+  </div>
+  <a class="primary" routerLink="/ordenes/nueva" *siPermiso="'ORDEN_REGISTRAR'">+ Nueva orden</a>
+</div>
+<div class="stat-grid">
+  <article class="stat">
+    <span>ÓRDENES EN ESTA CONSULTA</span><strong>{{ resultado()?.totalElementos ?? 0 }}</strong
+    ><small>Registros encontrados</small>
+  </article>
+  <article class="stat">
+    <span>REGISTRADAS EN ESTA PÁGINA</span><strong>{{ registradas() }}</strong
+    ><small>{{ anuladas() }} anuladas en esta página</small>
+  </article>
+  <article class="stat accent">
+    <span>IMPORTE DE ESTA PÁGINA</span><strong>S/ {{ total() | number: '1.2-2' }}</strong
+    ><small>Excluye órdenes anuladas</small>
+  </article>
+</div>
+<section class="panel">
+  <form class="filter-bar" [formGroup]="filtros" (ngSubmit)="aplicarFiltros()">
+    <div>
+      <label for="placa">Placa</label
+      ><input id="placa" formControlName="placa" placeholder="ABC-123" />
+    </div>
+    <div>
+      <label for="estado">Estado</label
+      ><select id="estado" formControlName="estado">
+        <option value="">Todos</option>
+        <option value="REGISTRADA">Registrada</option>
+        <option value="ANULADA">Anulada</option>
+      </select>
+    </div>
+    <div>
+      <label for="desde">Desde</label><input id="desde" type="date" formControlName="desde" />
+    </div>
+    <div>
+      <label for="hasta">Hasta</label><input id="hasta" type="date" formControlName="hasta" />
+    </div>
+    <button class="primary" [disabled]="cargando()">Filtrar</button
+    ><button type="button" class="text-button" (click)="limpiar()">Limpiar</button>
+  </form>
+  <div class="orden-listado">
+    <label
+      >Ordenar por<select
+        aria-label="Ordenar por"
+        [ngModel]="ordenarPor()"
+        (ngModelChange)="cambiarOrden($event)"
+        [disabled]="cargando()"
+      >
+        <option value="fecha">Fecha</option>
+        <option value="numero">Número</option>
+        <option value="placa">Placa</option>
+        <option value="total">Total</option>
+      </select></label
+    ><label
+      >Dirección<select
+        aria-label="Dirección"
+        [ngModel]="direccion()"
+        (ngModelChange)="cambiarDireccion($event)"
+        [disabled]="cargando()"
+      >
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+      </select></label
+    >
+  </div>
+  @if (error()) {
+    <p class="alert error" role="alert">{{ error() }}</p>
+    <button class="secondary" (click)="cargar()">Reintentar</button>
+  }
+  @if (cargando()) {
+    <div class="empty-state" role="status">Cargando órdenes…</div>
+  } @else if (!ordenes().length) {
+    <div class="empty-state">
+      <h2>Todavía no hay resultados</h2>
+      <p>Prueba con otros filtros o registra una nueva orden.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Orden / fecha</th>
+            <th>Vehículo</th>
+            <th>Cliente</th>
+            <th>Kilometraje</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of ordenes(); track o.id) {
+            <tr>
+              <td>
+                <a class="strong code" [routerLink]="['/ordenes', o.id]">{{ o.numero }}</a
+                ><small class="table-subtext">{{ o.fecha | date: 'dd/MM/yyyy HH:mm' }}</small>
+              </td>
+              <td>
+                <span class="plate">{{ o.placa }}</span>
+              </td>
+              <td>{{ o.clienteNombre }}</td>
+              <td>{{ o.kilometraje | number }} km</td>
+              <td>
+                <span class="badge" [class.inactive]="o.estado === 'ANULADA'">{{
+                  o.estado === 'REGISTRADA' ? 'Registrada' : 'Anulada'
+                }}</span>
+              </td>
+              <td class="strong">S/ {{ o.total | number: '1.2-2' }}</td>
+              <td><a class="text-button" [routerLink]="['/ordenes', o.id]">Ver detalle ↗</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  <app-paginador
+    [pagina]="pagina()"
+    [tamanio]="tamanio()"
+    [totalElementos]="resultado()?.totalElementos ?? 0"
+    [totalPaginas]="resultado()?.totalPaginas ?? 0"
+    [ocupado]="cargando()"
+    (paginaCambiada)="irA($event)"
+    (tamanioCambiado)="cambiarTamanio($event)"
+  />
+  <div class="table-footer">Consulta de órdenes <span>Ordenadas por fecha más reciente</span></div>
+</section>

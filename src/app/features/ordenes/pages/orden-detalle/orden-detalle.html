@@ -1,0 +1,102 @@
+<a class="back-link" routerLink="/ordenes">← Volver a órdenes</a>
+@if (error()) {
+  <p class="alert error" role="alert">{{ error() }}</p>
+}
+@if (cargando()) {
+  <section class="panel empty-state" role="status">Cargando orden…</section>
+} @else if (orden(); as o) {
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">ORDEN DE SERVICIO</span>
+      <h1>{{ o.numero }}</h1>
+      <p class="muted">
+        {{ o.fecha | date: 'dd/MM/yyyy · HH:mm' }} · Registrada por {{ o.usuarioRegistro }}
+      </p>
+    </div>
+    <div class="row-actions">
+      <span class="badge" [class.inactive]="o.estado === 'ANULADA'">{{ o.estado }}</span
+      ><button class="secondary" (click)="imprimir()">Imprimir</button>
+      @if (o.estado === 'REGISTRADA') {
+        <button
+          class="danger-button"
+          *siPermiso="'ORDEN_ANULAR'"
+          (click)="mostrarAnulacion.set(!mostrarAnulacion())"
+        >
+          Anular orden
+        </button>
+      }
+    </div>
+  </div>
+  <section class="panel receipt">
+    <div class="receipt-meta">
+      <div>
+        <span class="eyebrow">VEHÍCULO</span>
+        <h2>{{ o.placa }}</h2>
+      </div>
+      <div>
+        <span class="eyebrow">CLIENTE</span>
+        <h3>{{ o.clienteNombre }}</h3>
+      </div>
+      <div>
+        <span class="eyebrow">KILOMETRAJE</span>
+        <h3>{{ o.kilometraje | number }} km</h3>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of o.detalles; track d.id) {
+            <tr>
+              <td>
+                <span class="code">{{ d.codigo }}</span
+                ><strong class="table-subtext">{{ d.servicio }}</strong>
+              </td>
+              <td>{{ d.cantidad }}</td>
+              <td>S/ {{ d.precioUnitario | number: '1.2-2' }}</td>
+              <td>S/ {{ d.subtotal | number: '1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="receipt-total">
+      <span>Total confirmado</span><strong>S/ {{ o.total | number: '1.2-2' }}</strong>
+    </div>
+    @if (o.motivoAnulacion) {
+      <p class="alert">Motivo de anulación: {{ o.motivoAnulacion }}</p>
+    }
+  </section>
+  @if (mostrarAnulacion()) {
+    <section class="panel form-panel" *siPermiso="'ORDEN_ANULAR'">
+      <h2>Anular esta orden</h2>
+      <p class="muted">
+        Solo se permite el mismo día del registro. El backend comprobará la regla.
+      </p>
+      <form [formGroup]="form" (ngSubmit)="anular()">
+        <label for="motivo">Motivo de anulación</label
+        ><textarea id="motivo" rows="3" formControlName="motivo" maxlength="200"></textarea
+        ><app-field-error [control]="form.controls.motivo" />
+        <div class="form-actions">
+          <button
+            type="button"
+            class="secondary"
+            [disabled]="guardando()"
+            (click)="mostrarAnulacion.set(false)"
+          >
+            Cancelar</button
+          ><button class="danger-button" [disabled]="guardando()">
+            {{ guardando() ? 'Anulando…' : 'Confirmar anulación' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+}

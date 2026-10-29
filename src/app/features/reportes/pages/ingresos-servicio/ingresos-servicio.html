@@ -1,0 +1,91 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">ANÁLISIS / 04</span>
+    <h1>Ingresos por servicio</h1>
+    <p class="muted">Identifica los servicios que impulsan al taller.</p>
+  </div>
+  <button class="secondary" [disabled]="!filas().length || cargando()" (click)="imprimir()">
+    Imprimir reporte
+  </button>
+</div>
+<section class="panel">
+  <form class="filter-bar" [formGroup]="form" (ngSubmit)="cargar()">
+    <div>
+      <label for="desde">Desde</label
+      ><input id="desde" type="date" formControlName="desde" required />
+    </div>
+    <div>
+      <label for="hasta">Hasta</label
+      ><input id="hasta" type="date" formControlName="hasta" required />
+    </div>
+    <button class="primary" [disabled]="cargando() || form.invalid">
+      {{ cargando() ? 'Consultando…' : 'Consultar reporte →' }}
+    </button>
+  </form>
+</section>
+@if (error()) {
+  <p class="alert error" role="alert">{{ error() }}</p>
+}
+@if (cargando()) {
+  <section class="panel empty-state" role="status">Preparando reporte…</section>
+} @else if (consultado()) {
+  <div class="stat-grid">
+    <article class="stat accent">
+      <span>INGRESOS REGISTRADOS</span><strong>S/ {{ total() | number: '1.2-2' }}</strong
+      ><small>Excluye órdenes anuladas</small>
+    </article>
+    <article class="stat">
+      <span>SERVICIOS REALIZADOS</span><strong>{{ unidades() }}</strong
+      ><small>Unidades en el periodo</small>
+    </article>
+    <article class="stat">
+      <span>TIPOS DE SERVICIO</span><strong>{{ filas().length }}</strong
+      ><small>{{ periodo() }}</small>
+    </article>
+  </div>
+  <section class="panel">
+    <div class="section-heading panel-title">
+      <h2>Distribución de ingresos</h2>
+      <span class="muted">{{ periodo() }}</span>
+    </div>
+    @if (!filas().length) {
+      <div class="empty-state">
+        <h3>No hay ingresos en este periodo</h3>
+        <p>Selecciona otras fechas para consultar.</p>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Servicio</th>
+              <th>Cantidad</th>
+              <th>Ingresos</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of filas(); track f.codigo) {
+              <tr>
+                <td class="code">{{ f.codigo }}</td>
+                <td>
+                  <strong>{{ f.servicio }}</strong>
+                  <div class="bar-track">
+                    <div [style.width.%]="(f.importeTotal / maximo()) * 100"></div>
+                  </div>
+                </td>
+                <td>{{ f.cantidadTotal }}</td>
+                <td class="strong">S/ {{ f.importeTotal | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+} @else {
+  <section class="panel empty-state">
+    <h2>Elige un periodo para comenzar</h2>
+    <p>El reporte considera únicamente órdenes registradas.</p>
+  </section>
+}
