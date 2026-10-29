@@ -1,0 +1,78 @@
+<a class="back-link" routerLink="/vehiculos">← Volver a vehículos</a>
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">CATÁLOGO / VEHÍCULO</span>
+    <h1>{{ id ? 'Editar' : 'Nuevo' }} vehículo</h1>
+    <p class="muted">Completa los datos para mantener el registro actualizado.</p>
+  </div>
+</div>
+@if (error()) {
+  <div class="alert error" role="alert">{{ error() }}</div>
+}
+@if (cargando()) {
+  <div class="panel empty-state">Cargando datos…</div>
+} @else {
+  <form class="panel form-panel" [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="section-heading">
+      <span class="section-number">01</span>
+      <h2>Información del vehículo</h2>
+    </div>
+    <fieldset [disabled]="guardando() || !listo()">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="placa">Placa</label
+          ><input
+            id="placa"
+            type="text"
+            formControlName="placa"
+            placeholder="ABC-123"
+          /><app-field-error [control]="form.controls.placa" />
+        </div>
+        <div class="form-field">
+          <label for="marca">Marca</label
+          ><input
+            id="marca"
+            type="text"
+            formControlName="marca"
+            placeholder="Ej. Toyota"
+          /><app-field-error [control]="form.controls.marca" />
+        </div>
+        <div class="form-field">
+          <label for="modelo">Modelo</label
+          ><input
+            id="modelo"
+            type="text"
+            formControlName="modelo"
+            placeholder="Ej. Yaris"
+          /><app-field-error [control]="form.controls.modelo" />
+        </div>
+        <div class="form-field">
+          <label for="anio">Año</label
+          ><input
+            id="anio"
+            type="number"
+            formControlName="anio"
+            placeholder=""
+            min="1990"
+            max="2027"
+          /><app-field-error [control]="form.controls.anio" />
+        </div>
+        <div class="form-field full-width">
+          <label for="clienteId">Cliente propietario</label
+          ><select id="clienteId" formControlName="clienteId">
+            <option [ngValue]="0">Selecciona un cliente</option>
+            @for (c of clientes(); track c.id) {
+              <option [ngValue]="c.id">{{ c.nombres }} · {{ c.documento }}</option>
+            }</select
+          ><app-field-error [control]="form.controls.clienteId" />
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <a class="secondary" routerLink="/vehiculos">Cancelar</a
+      ><button class="primary" [disabled]="guardando() || !listo()">
+        {{ guardando() ? 'Guardando…' : 'Guardar vehículo →' }}
+      </button>
+    </div>
+  </form>
+}
