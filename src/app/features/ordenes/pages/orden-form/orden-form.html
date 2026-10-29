@@ -1,0 +1,143 @@
+<a class="back-link" routerLink="/ordenes">← Volver a órdenes</a>
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">OPERACIONES / NUEVA ORDEN</span>
+    <h1>Un nuevo servicio.<br />Todo en orden.</h1>
+    <p class="muted">Selecciona el vehículo y los servicios que necesita.</p>
+  </div>
+  <span class="heading-note">01 — REGISTRO</span>
+</div>
+@if (registrada(); as orden) {
+  <section class="panel success-card" role="status">
+    <span class="success-icon">✓</span>
+    <h2>Orden {{ orden.numero }} registrada</h2>
+    <p>
+      El taller ya tiene una nueva orden. Total confirmado:
+      <strong>S/ {{ orden.total | number: '1.2-2' }}</strong
+      >.
+    </p>
+    <a class="primary" [routerLink]="['/ordenes', orden.id]">Ver orden →</a
+    ><a class="secondary" routerLink="/ordenes">Volver a la consulta</a>
+  </section>
+} @else {
+  @if (error()) {
+    <p class="alert error" role="alert">{{ error() }}</p>
+  }
+  @if (cargando()) {
+    <section class="panel empty-state" role="status">Cargando vehículos y servicios…</section>
+  } @else if (!disponible()) {
+    <section class="panel empty-state">
+      <h2>Faltan datos para registrar</h2>
+      <p>Necesitas un vehículo y al menos un servicio activo.</p>
+      <button class="secondary" (click)="cargar()">Volver a cargar</button>
+    </section>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <fieldset [disabled]="guardando()">
+        <section class="panel form-panel">
+          <div class="section-heading">
+            <span class="section-number">01</span>
+            <h2>Vehículo y kilometraje</h2>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="vehiculoId">Vehículo / cliente</label
+              ><select id="vehiculoId" formControlName="vehiculoId">
+                <option [ngValue]="0">Selecciona un vehículo</option>
+                @for (v of vehiculos(); track v.id) {
+                  <option [ngValue]="v.id">{{ v.placa }} · {{ v.clienteNombre }}</option>
+                }</select
+              ><app-field-error [control]="form.controls.vehiculoId" />
+            </div>
+            <div class="form-field">
+              <label for="kilometraje">Kilometraje actual</label>
+              <div class="input-unit">
+                <input
+                  id="kilometraje"
+                  type="number"
+                  min="0"
+                  max="9999999"
+                  step="1"
+                  formControlName="kilometraje"
+                /><span>km</span>
+              </div>
+              <app-field-error [control]="form.controls.kilometraje" />
+            </div>
+          </div>
+        </section>
+        <section class="panel form-panel">
+          <div class="section-heading">
+            <span class="section-number">02</span>
+            <h2>Servicios de la orden</h2>
+            <span class="record-count">{{ detalles.length }} / 10 líneas</span>
+          </div>
+          <div formArrayName="detalles">
+            @for (linea of detalles.controls; track linea; let i = $index) {
+              <div class="order-line" [formGroupName]="i">
+                <span class="line-number">{{ i + 1 }}</span>
+                <div class="form-field">
+                  <label [for]="'servicio-' + i">Servicio</label
+                  ><select [id]="'servicio-' + i" formControlName="servicioId">
+                    <option [ngValue]="0">Selecciona un servicio</option>
+                    @for (s of servicios(); track s.id) {
+                      <option [ngValue]="s.id" [disabled]="seleccionado(s.id, i)">
+                        {{ s.codigo }} · {{ s.nombre }} · S/ {{ s.precio | number: '1.2-2' }}
+                      </option>
+                    }</select
+                  ><app-field-error [control]="linea.controls.servicioId" />
+                </div>
+                <div class="form-field quantity">
+                  <label [for]="'cantidad-' + i">Cantidad</label
+                  ><input
+                    [id]="'cantidad-' + i"
+                    type="number"
+                    min="1"
+                    max="5"
+                    step="1"
+                    formControlName="cantidad"
+                  /><app-field-error [control]="linea.controls.cantidad" />
+                </div>
+                <div class="line-subtotal">
+                  <small>SUBTOTAL</small><strong>S/ {{ subtotal(i) | number: '1.2-2' }}</strong>
+                </div>
+                <button
+                  type="button"
+                  class="icon-button danger"
+                  [attr.aria-label]="'Quitar línea ' + (i + 1)"
+                  [disabled]="detalles.length === 1"
+                  (click)="quitar(i)"
+                >
+                  ×
+                </button>
+              </div>
+            }
+          </div>
+          @if (detalles.hasError('repetidos')) {
+            <p class="field-error" role="alert">No se puede repetir el mismo servicio.</p>
+          }
+          <button
+            type="button"
+            class="secondary"
+            (click)="agregar()"
+            [disabled]="detalles.length >= 10"
+          >
+            + Agregar servicio
+          </button>
+        </section>
+        <section class="order-total">
+          <div>
+            <span class="eyebrow">TOTAL ESTIMADO</span>
+            <p class="muted">El servidor confirma precios y total al registrar.</p>
+          </div>
+          <strong>S/ {{ total() | number: '1.2-2' }}</strong>
+        </section>
+      </fieldset>
+      <div class="form-actions">
+        <a class="secondary" routerLink="/ordenes">Cancelar</a
+        ><button class="primary" [disabled]="guardando() || form.invalid">
+          {{ guardando() ? 'Registrando…' : 'Registrar orden →' }}
+        </button>
+      </div>
+    </form>
+  }
+}

@@ -1,0 +1,78 @@
+<a class="back-link" routerLink="/servicios">← Volver a servicios</a>
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">CATÁLOGO / SERVICIO</span>
+    <h1>{{ id ? 'Editar' : 'Nuevo' }} servicio</h1>
+    <p class="muted">Completa los datos para mantener el registro actualizado.</p>
+  </div>
+</div>
+@if (error()) {
+  <div class="alert error" role="alert">{{ error() }}</div>
+}
+@if (cargando()) {
+  <div class="panel empty-state">Cargando datos…</div>
+} @else {
+  <form class="panel form-panel" [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="section-heading">
+      <span class="section-number">01</span>
+      <h2>Información del servicio</h2>
+    </div>
+    <fieldset [disabled]="guardando() || !listo()">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="codigo">Código</label
+          ><input
+            id="codigo"
+            type="text"
+            formControlName="codigo"
+            placeholder="SRV-009"
+          /><app-field-error [control]="form.controls.codigo" />
+        </div>
+        <div class="form-field">
+          <label for="nombre">Nombre del servicio</label
+          ><input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            placeholder="Ej. Cambio de aceite"
+          /><app-field-error [control]="form.controls.nombre" />
+        </div>
+        <div class="form-field">
+          <label for="precio">Precio (S/)</label
+          ><input
+            id="precio"
+            type="number"
+            formControlName="precio"
+            placeholder=""
+            min="0.01"
+            step="0.01"
+          /><app-field-error [control]="form.controls.precio" />
+        </div>
+        <div class="form-field">
+          <label for="duracionMin">Duración (minutos)</label
+          ><input
+            id="duracionMin"
+            type="number"
+            formControlName="duracionMin"
+            placeholder=""
+            min="15"
+            max="480"
+          /><app-field-error [control]="form.controls.duracionMin" />
+        </div>
+        <div class="form-field">
+          <label for="activo">Estado</label
+          ><select id="activo" formControlName="activo">
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option></select
+          ><app-field-error [control]="form.controls.activo" />
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <a class="secondary" routerLink="/servicios">Cancelar</a
+      ><button class="primary" [disabled]="guardando() || !listo()">
+        {{ guardando() ? 'Guardando…' : 'Guardar servicio →' }}
+      </button>
+    </div>
+  </form>
+}

@@ -1,0 +1,20 @@
+<div class="modal-backdrop" (keydown.escape)="cerrar()">
+  <section
+    class="confirm-card"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirmacion-titulo"
+    aria-describedby="confirmacion-mensaje"
+    (keydown.tab)="moverFoco($event)"
+  >
+    <span class="eyebrow">CONFIRMAR OPERACIÓN</span>
+    <h2 id="confirmacion-titulo">{{ titulo() }}</h2>
+    <p id="confirmacion-mensaje">{{ mensaje() }}</p>
+    <div class="form-actions">
+      <button #cancelarBoton type="button" class="secondary" (click)="cerrar()">Cancelar</button
+      ><button #aceptarBoton type="button" class="danger-button" (click)="confirmar()">
+        Confirmar
+      </button>
+    </div>
+  </section>
+</div>

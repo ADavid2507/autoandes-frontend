@@ -1,0 +1,36 @@
+<nav class="paginador" aria-label="Paginación">
+  <label
+    >Filas por página<select
+      aria-label="Filas por página"
+      [value]="tamanio()"
+      [disabled]="ocupado()"
+      (change)="cambiarTamanio($event)"
+    >
+      @for (n of tamanios; track n) {
+        <option [value]="n">{{ n }}</option>
+      }
+    </select></label
+  ><span class="resumen" aria-live="polite"
+    >Página {{ totalPaginas() ? pagina() + 1 : 0 }} de {{ totalPaginas() }} ·
+    {{ totalElementos() }} registros</span
+  >
+  <div class="botones">
+    <button
+      type="button"
+      class="secondary"
+      aria-label="Página anterior"
+      [disabled]="ocupado() || pagina() === 0 || totalPaginas() === 0"
+      (click)="irA(pagina() - 1)"
+    >
+      ← Anterior</button
+    ><button
+      type="button"
+      class="secondary"
+      aria-label="Página siguiente"
+      [disabled]="ocupado() || pagina() + 1 >= totalPaginas()"
+      (click)="irA(pagina() + 1)"
+    >
+      Siguiente →
+    </button>
+  </div>
+</nav>

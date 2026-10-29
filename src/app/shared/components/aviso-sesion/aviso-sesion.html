@@ -1,0 +1,8 @@
+@if (auth.porVencer() && !auth.avisoSesionOculto()) {
+  <div class="session-warning" role="status">
+    <span
+      >Tu sesión vence en {{ auth.segundosRestantes() }} segundos. Guarda tu trabajo antes de
+      salir.</span
+    ><button class="text-button" (click)="auth.ocultarAvisoSesion()">Entendido</button>
+  </div>
+}
