@@ -1,0 +1,131 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">CATÁLOGO / 03</span>
+    <h1>Servicios</h1>
+    <p class="muted">Los servicios que mantienen a tus clientes en marcha.</p>
+  </div>
+  <a class="primary" routerLink="/servicios/nuevo" *siPermiso="'SERVICIO_ESCRIBIR'"
+    >+ Nuevo servicio</a
+  >
+</div>
+@if (error()) {
+  <div class="alert error" role="alert">{{ error() }}</div>
+}
+<section class="panel">
+  <div class="table-toolbar">
+    <div class="orden-listado">
+      <label
+        >Ordenar por<select
+          aria-label="Ordenar por"
+          [ngModel]="ordenarPor()"
+          (ngModelChange)="cambiarOrden($event)"
+          [disabled]="cargando()"
+        >
+          <option value="nombre">Nombre</option>
+          <option value="codigo">Código</option>
+          <option value="precio">Precio</option>
+          <option value="duracionMin">Duración</option>
+        </select></label
+      ><label
+        >Dirección<select
+          aria-label="Dirección"
+          [ngModel]="direccion()"
+          (ngModelChange)="cambiarDireccion($event)"
+          [disabled]="cargando()"
+        >
+          <option value="asc">Ascendente</option>
+          <option value="desc">Descendente</option>
+        </select></label
+      >
+    </div>
+    <label class="search-field"
+      ><span>⌕</span
+      ><input
+        aria-label="Buscar servicios"
+        placeholder="Buscar por código o nombre…"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)" /></label
+    ><span class="record-count">{{ resultado()?.totalElementos ?? 0 }} registros</span>
+  </div>
+  @if (cargando()) {
+    <div class="empty-state" role="status">Cargando servicios…</div>
+  } @else if (filtrados().length === 0) {
+    <div class="empty-state">
+      <h3>Sin resultados</h3>
+      <p>No hay servicios que coincidan con tu búsqueda.</p>
+      <button class="secondary" (click)="cargar()">Actualizar lista</button>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Servicio</th>
+            <th>Precio</th>
+            <th>Duración</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filtrados(); track item.id) {
+            <tr>
+              <td>
+                <span class="code">{{ item.codigo }}</span>
+              </td>
+              <td class="strong">{{ item.nombre }}</td>
+              <td>S/ {{ item.precio | number: '1.2-2' }}</td>
+              <td>{{ item.duracionMin }} min</td>
+              <td>
+                <span class="badge" [class.inactive]="!item.activo">{{
+                  item.activo ? 'Activo' : 'Inactivo'
+                }}</span>
+              </td>
+              <td>
+                <div class="row-actions" *siPermiso="'SERVICIO_ESCRIBIR'">
+                  <a class="text-button" [routerLink]="['/servicios', item.id, 'editar']"
+                    >Editar ↗</a
+                  ><button
+                    class="text-button"
+                    [disabled]="pendiente() !== null"
+                    (click)="estado(item)"
+                  >
+                    {{ item.activo ? 'Dar de baja' : 'Activar' }}</button
+                  ><button
+                    class="text-button danger"
+                    [disabled]="pendiente() !== null"
+                    (click)="eliminar(item)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  <app-paginador
+    [pagina]="pagina()"
+    [tamanio]="tamanio()"
+    [totalElementos]="resultado()?.totalElementos ?? 0"
+    [totalPaginas]="resultado()?.totalPaginas ?? 0"
+    [ocupado]="cargando() || pendiente() !== null"
+    (paginaCambiada)="irA($event)"
+    (tamanioCambiado)="cambiarTamanio($event)"
+  />
+  <div class="table-footer">
+    Datos de AutoAndes API <span>Actualiza la lista para ver cambios de otros usuarios.</span>
+  </div>
+</section>
+
+@if (confirmacion(); as c) {
+  <app-confirmacion
+    [titulo]="c.titulo"
+    [mensaje]="c.mensaje"
+    (aceptar)="confirmar()"
+    (cancelar)="confirmacion.set(null)"
+  />
+}

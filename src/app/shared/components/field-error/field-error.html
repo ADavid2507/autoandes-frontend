@@ -1,0 +1,5 @@
+@if (control(); as c) {
+  @if (c.invalid && c.touched) {
+    <small class="field-error" role="alert">{{ mensaje(c) }}</small>
+  }
+}

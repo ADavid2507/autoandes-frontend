@@ -1,0 +1,20 @@
+<aside class="sidebar">
+  <a class="brand" routerLink="/ordenes"
+    ><span class="brand-mark">A</span>
+    <div>AutoAndes<small>GESTIÓN DE TALLER</small></div></a
+  >
+  <p class="nav-caption">ESPACIO DE TRABAJO</p>
+  <nav aria-label="Principal">
+    @for (item of menu; track item.ruta) {
+      @if (auth.tienePermiso(item.permiso)) {
+        <a [routerLink]="item.ruta" routerLinkActive="active"
+          ><span class="nav-number">{{ item.numero }}</span
+          >{{ item.texto }}<span class="nav-arrow">↗</span></a
+        >
+      }
+    }
+  </nav>
+  <div class="sidebar-bottom">
+    <span class="status-dot"></span> Taller · Sistema de gestión<small>AutoAndes Web / v1.0</small>
+  </div>
+</aside>

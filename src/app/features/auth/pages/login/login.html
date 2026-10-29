@@ -1,0 +1,45 @@
+<main class="login-shell">
+  <section class="login-story">
+    <a class="brand"
+      ><span class="brand-mark">A</span>
+      <div>AutoAndes<small>GESTIÓN DE TALLER</small></div></a>
+    <div class="login-copy">
+      <span class="eyebrow">CADA KILÓMETRO CUENTA</span>
+      <h1>Tu taller.<br />En orden.</h1>
+      <p>Vehículos, servicios y órdenes.<br />Todo lo que necesitas para seguir avanzando.</p>
+    </div>
+  </section>
+  <section class="login-form">
+    <div class="login-card">
+      <span class="eyebrow">BIENVENIDO A AUTOANDES</span>
+      <h2>Iniciar sesión</h2>
+      <p class="muted">Ingresa con tu cuenta para continuar.</p>
+      @if (error()) {
+        <p class="alert error" role="alert">{{ error() }}</p>
+      }
+      <form [formGroup]="form" (ngSubmit)="enviar()">
+        <label for="username">Usuario</label
+        ><input
+          id="username"
+          autocomplete="username"
+          formControlName="username"
+          placeholder="Tu usuario"
+        /><app-field-error [control]="form.controls.username" /><label for="password"
+          >Contraseña</label
+        ><input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          formControlName="password"
+          placeholder="Tu contraseña"
+        /><app-field-error [control]="form.controls.password" /><button
+          class="primary full"
+          [disabled]="cargando()"
+        >
+          {{ cargando() ? 'Ingresando…' : 'Entrar al taller →' }}
+        </button>
+      </form>
+      <p class="login-note">Por seguridad, cierra tu sesión al terminar tu turno.</p>
+    </div>
+  </section>
+</main>
